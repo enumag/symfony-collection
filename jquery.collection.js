@@ -50,7 +50,8 @@
          name_prefix: null,
          elements_selector: '> div',
          children: null,
-         init_with_n_elements: 0
+         init_with_n_elements: 0,
+         drag_drop: true,
       };
 
       var randomNumber = function() {
@@ -352,6 +353,29 @@
 
          if (settings.init_with_n_elements < settings.min) {
              settings.init_with_n_elements = settings.min;
+         }
+
+         if (settings.drag_drop) {
+             var oldPosition;
+             var newPosition;
+             if (typeof jQuery.ui === 'undefined') {
+                 settings.drag_drop = false;
+             } else {
+                 collection.sortable({
+                     placeholder: "ui-state-highlight",
+                     start: function(event, ui) {
+                        var elements = collection.find(settings.elements_selector);
+                        var element = ui.item;
+                        oldPosition = elements.index(element);
+                     },
+                     update: function(event, ui) {
+                        var elements = collection.find(settings.elements_selector);
+                        var element = ui.item;
+                        newPosition = elements.index(element);
+                        swapElements(collection, elements, oldPosition, newPosition);
+                     }
+                 });
+             }
          }
 
          collection.data('collection-settings', settings);
